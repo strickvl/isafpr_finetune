@@ -166,3 +166,7 @@ cython_debug/
 nohup.out
 .python-version
 axolotl/
+last_run_prepared/
+myenv/
+outputs/
+wandb/
