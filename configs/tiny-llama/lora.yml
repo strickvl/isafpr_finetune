@@ -10,8 +10,9 @@ data_seed: 42
 seed: 42
 
 datasets:
-  - path: data/isaf_pr_ft.jsonl
-    type: input_output
+  - path: data/isaf_press_releases_ft.jsonl
+    conversation: alpaca
+    type: sharegpt
 dataset_prepared_path:
 val_set_size: 0.05
 output_dir: ./outputs/tiny-llama/lora-out
