@@ -1,4 +1,3 @@
-from rich import print
 import json
 import os
 import re
@@ -7,19 +6,20 @@ import modal
 from peft import AutoPeftModelForCausalLM
 from transformers import AutoTokenizer
 from modal import Image
+from rich import print
 
 datascience_image = (
     Image.debian_slim(python_version="3.10")
-    .pip_install("peft", "transformers")
+    .pip_install("peft", "transformers", "sentencepiece")
     .env({"HF_TOKEN": os.getenv("HF_TOKEN")})
 )
 
 app = modal.App("inference-llama3")
 
 
-@app.function(image=datascience_image, gpu="a100")
+@app.function(image=datascience_image, gpu="H100")
 def run_inference():
-    model_id = "strickvl/isafpr-llama3-lora"
+    model_id = "strickvl/isafpr-mistral-lora"
     model = AutoPeftModelForCausalLM.from_pretrained(model_id).cuda()
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -45,17 +45,18 @@ def run_inference():
             return out_ids
         return tokenizer.batch_decode(ids, skip_special_tokens=True)[0][len(_p) :]
 
-    pr1 = """2011-11-S-011 ISAF Joint Command - Afghanistan For Immediate Release KABUL, Afghanistan (Nov. 7, 2011) — A combined Afghan and coalition security force conducted an operation in search of a Haqqani facilitator in Argo district, Badakshan province. The facilitator coordinates suicide attacks with other insurgent leaders in the area. During the operation, a local national male failed to comply with repeated verbal warnings and displayed hostile intent toward the security force. The security force engaged the individual, resulting in his death. The security force confiscated a shotgun and intelligence linking the local national to the Haqqani network. The security force also detained two suspected insurgents during the operation."""
+    pr1 = """2011-10-S-057 ISAF Joint Command - Afghanistan KABUL, Afghanistan (Oct. 28, 2011) A combined Afghan and coalition security force captured a Haqqani network leader and detained multiple additional suspected insurgents during an operation in Nadir Shah Kot district, Khost province, yesterday. The leader was responsible for coordinating attacks against Afghan forces."""
 
-    out = prompt_tok(pr1).replace("</s>", "").strip()
-    print(out)
+    # out = "{" + prompt_tok(pr1).replace("</s>", "").strip()
 
-    # Remove newline characters from the output string
-    out = out.replace("\n", "")
+    # # Remove newline characters from the output string
+    # out = out.replace("\n", "")
 
-    # Add missing double quotes around keys and values using regex
-    out = re.sub(r"(\w+):", r'"\1":', out)
-    out = re.sub(r":(\w+)", r':"\1"', out)
+    # # Add missing double quotes around keys and values using regex
+    # out = re.sub(r"(\w+):", r'"\1":', out)
+    # out = re.sub(r":(\w+)", r':"\1"', out)
+    # out_dict = json.loads(out)
+    out = prompt_tok(pr1)
     print(out)
     out_dict = json.loads(out)
     return out_dict
@@ -64,4 +65,4 @@ def run_inference():
 @app.local_entrypoint()
 def main():
     # run the function remotely on Modal
-    print(run_inference.remote())
+    print("\n", run_inference.remote())
