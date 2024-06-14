@@ -1,6 +1,7 @@
 from rich import print
 import json
 import os
+import re
 
 import modal
 from peft import AutoPeftModelForCausalLM
@@ -46,7 +47,15 @@ def run_inference():
 
     pr1 = """2011-11-S-011 ISAF Joint Command - Afghanistan For Immediate Release KABUL, Afghanistan (Nov. 7, 2011) — A combined Afghan and coalition security force conducted an operation in search of a Haqqani facilitator in Argo district, Badakshan province. The facilitator coordinates suicide attacks with other insurgent leaders in the area. During the operation, a local national male failed to comply with repeated verbal warnings and displayed hostile intent toward the security force. The security force engaged the individual, resulting in his death. The security force confiscated a shotgun and intelligence linking the local national to the Haqqani network. The security force also detained two suspected insurgents during the operation."""
 
-    out = prompt_tok(pr1)
+    out = prompt_tok(pr1).replace("</s>", "").strip()
+    print(out)
+
+    # Remove newline characters from the output string
+    out = out.replace("\n", "")
+
+    # Add missing double quotes around keys and values using regex
+    out = re.sub(r"(\w+):", r'"\1":', out)
+    out = re.sub(r":(\w+)", r':"\1"', out)
     print(out)
     out_dict = json.loads(out)
     return out_dict
