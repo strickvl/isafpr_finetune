@@ -1,10 +1,8 @@
-base_model: TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T
-model_type: LlamaForCausalLM
+base_model: mistralai/Mistral-7B-v0.1
+model_type: MistralForCausalLM
 tokenizer_type: LlamaTokenizer
 
 load_in_8bit: false
-# I'm training on 4090 GPUs
-# so I'm using 4-bit precision to save on memory
 load_in_4bit: true
 strict: false
 
@@ -12,16 +10,17 @@ data_seed: 42
 seed: 42
 
 datasets:
-  - path: data/templatefree_isaf_press_releases_ft_train.jsonl
-    type: input_output
+  - path: data/sharegpt_isaf_press_releases_ft_train.jsonl
+    conversation: alpaca
+    type: sharegpt
 dataset_prepared_path:
 val_set_size: 0.1
-output_dir: ./outputs/tiny-llama/lora-out-templatefree
-hub_model_id: strickvl/isafpr-tiny-llama-lora-templatefree
+output_dir: ./outputs/mistral/lora-out-sharegpt
+hub_model_id: strickvl/isafpr-mistral-lora-sharegpt
+
 
 sequence_len: 4096
 sample_packing: true
-eval_sample_packing: false
 pad_to_sequence_len: true
 
 adapter: lora
@@ -31,6 +30,14 @@ lora_alpha: 16
 lora_dropout: 0.05
 lora_target_linear: true
 lora_fan_in_fan_out:
+lora_target_modules:
+  - gate_proj
+  - down_proj
+  - up_proj
+  - q_proj
+  - v_proj
+  - k_proj
+  - o_proj
 
 wandb_project: isaf_pr_ft
 wandb_entity: strickvl
@@ -59,8 +66,13 @@ logging_steps: 1
 xformers_attention:
 flash_attention: true
 
+loss_watchdog_threshold: 5.0
+loss_watchdog_patience: 3
+
 warmup_steps: 10
 evals_per_epoch: 4
+eval_table_size:
+eval_max_new_tokens: 128
 saves_per_epoch: 1
 debug:
 deepspeed:
