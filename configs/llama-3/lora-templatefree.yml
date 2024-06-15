@@ -10,15 +10,14 @@ data_seed: 42
 seed: 42
 
 datasets:
-  - path: data/isaf_press_releases_ft.jsonl
-    conversation: alpaca
-    type: sharegpt
+  - path: data/templatefree_isaf_press_releases_ft_train.jsonl
+    type: input_output
 dataset_prepared_path:
-val_set_size: 0.05
-output_dir: ./outputs/llama3/lora-out
-hub_model_id: strickvl/isafpr-llama3-lora
+val_set_size: 0.1
+output_dir: ./outputs/llama3/lora-out-templatefree
+hub_model_id: strickvl/isafpr-llama3-lora-templatefree
 
-sequence_len: 2048
+sequence_len: 1024
 sample_packing: true
 eval_sample_packing: false
 pad_to_sequence_len: true
@@ -73,4 +72,6 @@ weight_decay: 0.0
 fsdp:
 fsdp_config:
 special_tokens:
-   pad_token: <|end_of_text|>
+  bos_token: "<s>"
+  eos_token: "</s>"
+  pad_token: <|end_of_text|>
