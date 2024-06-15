@@ -3,6 +3,8 @@ model_type: LlamaForCausalLM
 tokenizer_type: LlamaTokenizer
 
 load_in_8bit: false
+# I'm training on 4090 GPUs
+# so I'm using 4-bit precision to save on memory
 load_in_4bit: true
 strict: false
 
@@ -10,11 +12,10 @@ data_seed: 42
 seed: 42
 
 datasets:
-  - path: data/isaf_press_releases_ft.jsonl
-    conversation: alpaca
-    type: sharegpt
+  - path: data/templatefree_isaf_press_releases_ft_train.jsonl
+    type: input_output
 dataset_prepared_path:
-val_set_size: 0.05
+val_set_size: 0.1
 output_dir: ./outputs/tiny-llama/lora-out
 hub_model_id: strickvl/isafpr-tiny-llama-lora
 
