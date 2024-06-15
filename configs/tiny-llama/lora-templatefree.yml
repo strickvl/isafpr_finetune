@@ -16,8 +16,8 @@ datasets:
     type: input_output
 dataset_prepared_path:
 val_set_size: 0.1
-output_dir: ./outputs/tiny-llama/lora-out
-hub_model_id: strickvl/isafpr-tiny-llama-lora
+output_dir: ./outputs/tiny-llama/lora-out-templatefree
+hub_model_id: strickvl/isafpr-tiny-llama-lora-templatefree
 
 sequence_len: 4096
 sample_packing: true
