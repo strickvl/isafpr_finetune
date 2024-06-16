@@ -1,9 +1,9 @@
-base_model: mistralai/Mistral-7B-v0.1
-model_type: MistralForCausalLM
-tokenizer_type: LlamaTokenizer
+base_model: meta-llama/Meta-Llama-3-8B
+model_type: LlamaForCausalLM
+tokenizer_type: AutoTokenizer
 
-load_in_8bit: true
-load_in_4bit: false
+load_in_8bit: false
+load_in_4bit: true
 strict: false
 
 data_seed: 42
@@ -14,29 +14,25 @@ datasets:
     type: input_output
 dataset_prepared_path:
 val_set_size: 0.1
-output_dir: ./outputs/mistral/lora-out-templatefree
-hub_model_id: strickvl/isafpr-mistral-lora-templatefree
+output_dir: ./outputs/llama3/qlora-out-templatefree
+hub_model_id: strickvl/isafpr-llama3-qlora-templatefree
 
+adapter: qlora
+lora_model_dir:
 
-sequence_len: 2048
+sequence_len: 1024
 sample_packing: true
 pad_to_sequence_len: true
 
-adapter: lora
-lora_model_dir:
 lora_r: 32
 lora_alpha: 16
 lora_dropout: 0.05
+lora_target_modules:
 lora_target_linear: true
 lora_fan_in_fan_out:
-lora_target_modules:
-  - gate_proj
-  - down_proj
-  - up_proj
-  - q_proj
-  - v_proj
-  - k_proj
-  - o_proj
+lora_modules_to_save:
+  - embed_tokens
+  - lm_head
 
 wandb_project: isaf_pr_ft
 wandb_entity: strickvl
@@ -47,7 +43,7 @@ wandb_log_model:
 gradient_accumulation_steps: 4
 micro_batch_size: 2
 num_epochs: 4
-optimizer: adamw_bnb_8bit
+optimizer: paged_adamw_32bit
 lr_scheduler: cosine
 learning_rate: 0.0002
 
@@ -65,13 +61,9 @@ logging_steps: 1
 xformers_attention:
 flash_attention: true
 
-loss_watchdog_threshold: 5.0
-loss_watchdog_patience: 3
-
 warmup_steps: 10
 evals_per_epoch: 4
 eval_table_size:
-eval_max_new_tokens: 128
 saves_per_epoch: 1
 debug:
 deepspeed:
@@ -81,3 +73,4 @@ fsdp_config:
 special_tokens:
   bos_token: "<s>"
   eos_token: "</s>"
+  pad_token: "<|end_of_text|>"

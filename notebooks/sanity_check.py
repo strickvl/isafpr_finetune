@@ -6,6 +6,7 @@ from peft import AutoPeftModelForCausalLM
 from transformers import AutoTokenizer
 from modal import Image
 from rich import print
+import torch
 
 datascience_image = (
     Image.debian_slim(python_version="3.10")
@@ -20,7 +21,11 @@ app = modal.App("inference-llama3")
 def run_inference():
     # model_id = "strickvl/isafpr-mistral-lora-templatefree"
     model_id = "strickvl/isafpr-llama3-lora-templatefree"
-    model = AutoPeftModelForCausalLM.from_pretrained(model_id).cuda()
+    model = AutoPeftModelForCausalLM.from_pretrained(
+        model_id,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    ).cuda()
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
 

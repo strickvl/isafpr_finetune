@@ -1,25 +1,26 @@
-base_model: mistralai/Mistral-7B-v0.1
-model_type: MistralForCausalLM
-tokenizer_type: LlamaTokenizer
+base_model: meta-llama/Meta-Llama-3-8B
+model_type: LlamaForCausalLM
+tokenizer_type: AutoTokenizer
 
-load_in_8bit: true
-load_in_4bit: false
+load_in_8bit: false
+load_in_4bit: true
 strict: false
 
 data_seed: 42
 seed: 42
 
 datasets:
-  - path: data/templatefree_isaf_press_releases_ft_train.jsonl
-    type: input_output
+  - path: data/sharegpt_isaf_press_releases_ft_train.jsonl
+    type: sharegpt
+    conversation: alpaca
 dataset_prepared_path:
 val_set_size: 0.1
-output_dir: ./outputs/mistral/lora-out-templatefree
-hub_model_id: strickvl/isafpr-mistral-lora-templatefree
+output_dir: ./outputs/llama3/lora-out-sharegpt
+hub_model_id: strickvl/isafpr-llama3-lora-sharegpt
 
-
-sequence_len: 2048
+sequence_len: 1024
 sample_packing: true
+eval_sample_packing: false
 pad_to_sequence_len: true
 
 adapter: lora
@@ -29,14 +30,9 @@ lora_alpha: 16
 lora_dropout: 0.05
 lora_target_linear: true
 lora_fan_in_fan_out:
-lora_target_modules:
-  - gate_proj
-  - down_proj
-  - up_proj
-  - q_proj
-  - v_proj
-  - k_proj
-  - o_proj
+lora_modules_to_save:
+  - embed_tokens
+  - lm_head
 
 wandb_project: isaf_pr_ft
 wandb_entity: strickvl
@@ -64,9 +60,7 @@ local_rank:
 logging_steps: 1
 xformers_attention:
 flash_attention: true
-
-loss_watchdog_threshold: 5.0
-loss_watchdog_patience: 3
+s2_attention:
 
 warmup_steps: 10
 evals_per_epoch: 4
@@ -81,3 +75,4 @@ fsdp_config:
 special_tokens:
   bos_token: "<s>"
   eos_token: "</s>"
+  pad_token: "<pad>"

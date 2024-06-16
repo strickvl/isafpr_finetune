@@ -74,4 +74,4 @@ fsdp_config:
 special_tokens:
   bos_token: "<s>"
   eos_token: "</s>"
-  pad_token: <|end_of_text|>
+  pad_token: "<pad>"
